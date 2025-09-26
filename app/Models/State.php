@@ -15,4 +15,8 @@ class State extends Model
     {
         return $this->hasMany(Municipality::class);
     }
+        public function branches()
+    {
+        return $this->hasMany(Branch::class);
+    }
 }

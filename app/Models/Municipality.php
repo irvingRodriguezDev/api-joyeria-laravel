@@ -15,4 +15,8 @@ class Municipality extends Model
     {
         return $this->belongsTo(State::class);
     }
+    public function branches()
+    {
+        return $this->hasMany(Branch::class);
+    }
 }
