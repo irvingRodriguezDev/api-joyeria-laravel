@@ -9,6 +9,11 @@ use DB;
 
 class UserController extends Controller
 {
+    public function index(){
+        $users = User::all();
+        return response()->json(["users" => $users]);
+    }
+
     public function store(Request $request)
     {
         // Opcional: Usar una política de autorización para verificar el rol del usuario
@@ -24,7 +29,6 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'shop_id' => 'required|integer|exists:shops,id',
             'branch_id' => 'required|integer|exists:branches,id',
         ]);
 
@@ -36,7 +40,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'type_user_id' => 3, // Tipo de usuario vendedor
-                'shop_id' => $request->shop_id,
+                'shop_id' => $request->user()->shop_id,
                 'branch_id' => $request->branch_id,
             ]);
 
@@ -48,4 +52,5 @@ class UserController extends Controller
             return response()->json(['message' => 'Error al crear el usuario.', 'error' => $e->getMessage()], 500);
         }
     }
+
 }

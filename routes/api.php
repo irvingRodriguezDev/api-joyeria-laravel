@@ -44,6 +44,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/branches', [BranchController::class, 'store']); 
     Route::get('/branches', [BranchController::class, 'index']); 
 
+
+    //users
+    Route::get('/users', [UserController::class, 'index']); 
+
 });
 Route::get('/states', [StateController::class, 'index']);
 Route::get('/municipalities/{id}', [MunicipalityController::class, 'index']);
