@@ -4,6 +4,7 @@ use App\Http\Controllers\StateController;
 use App\Http\Controllers\MunicipalityController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\BranchController; // Asegúrate de importar BranchController
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Autenticación
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::middleware('auth:sanctum')->post('/users', [UserController::class, 'store']);
 
     // Tiendas (Shops)
     Route::get('/shops', [ShopController::class, 'index']);
@@ -40,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Sucursales (Branches)
     // Se movió aquí y se quitó el prefijo 'auth'
     Route::post('/branches', [BranchController::class, 'store']); 
+    Route::get('/branches', [BranchController::class, 'index']); 
 
 });
 Route::get('/states', [StateController::class, 'index']);
