@@ -3,6 +3,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\MunicipalityController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\TypeUserController;
 use App\Http\Controllers\BranchController; // Asegúrate de importar BranchController
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -51,3 +52,4 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::get('/states', [StateController::class, 'index']);
 Route::get('/municipalities/{id}', [MunicipalityController::class, 'index']);
+Route::get('/typeUsers', [TypeUserController::class, 'index']);

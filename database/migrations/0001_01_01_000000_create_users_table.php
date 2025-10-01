@@ -18,7 +18,14 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             
-            $table->foreignId('type_user_id')->default(1)->constrained('type_users')->onDelete('cascade');
+            $table->foreignId('type_user_id')
+                ->default(1)
+                ->constrained('type_users')
+                ->onDelete('cascade');
+
+            $table->unsignedBigInteger('branch_id')->nullable();
+
+
             $table->rememberToken();
             $table->timestamps();
         });
@@ -47,7 +54,5 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
-        $table->dropForeign(['type_user_id']);
-        $table->dropColumn('type_user_id');
     }
 };

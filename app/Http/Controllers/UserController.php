@@ -10,7 +10,7 @@ use DB;
 class UserController extends Controller
 {
     public function index(){
-        $users = User::all();
+        $users = User::with('shop', 'typeUser', 'branch')->get();
         return response()->json(["users" => $users]);
     }
 

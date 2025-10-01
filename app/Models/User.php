@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'type_user_id',
+        'branch_id'
     ];
 
     /**
@@ -54,5 +56,9 @@ class User extends Authenticatable
     public function typeUser()
     {
         return $this->belongsTo(TypeUser::class);
+    }
+    public function branch()
+    {
+        return $this->belognsTo(Branch::class);
     }
 }
