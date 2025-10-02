@@ -6,6 +6,8 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\TypeUserController;
 use App\Http\Controllers\BranchController; // Asegúrate de importar BranchController
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TypeProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Se movió aquí y se quitó el prefijo 'auth'
     Route::post('/branches', [BranchController::class, 'store']); 
     Route::get('/branches', [BranchController::class, 'index']); 
+    //categories
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::get('/categories', [CategoryController::class, 'index']);
+    //typesProducts
+    Route::get('/typeProducts', [TypeProductController::class, 'index']); 
 
 
     //users
