@@ -8,6 +8,7 @@ use App\Http\Controllers\BranchController; // Asegúrate de importar BranchContr
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TypeProductController;
+use App\Http\Controllers\BusinessRuleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,15 +47,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Se movió aquí y se quitó el prefijo 'auth'
     Route::post('/branches', [BranchController::class, 'store']); 
     Route::get('/branches', [BranchController::class, 'index']); 
+    //businessRule
+    Route::post('/business-rules', [BusinessRuleController::class, 'store']);
+    Route::get('/business-rules', [BusinessRuleController::class, 'index']);
     //categories
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::get('/categories', [CategoryController::class, 'index']);
     //typesProducts
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 
 
-
     //users
     Route::get('/users', [UserController::class, 'index']); 
+
+    
+
 
 });
 Route::get('/states', [StateController::class, 'index']);

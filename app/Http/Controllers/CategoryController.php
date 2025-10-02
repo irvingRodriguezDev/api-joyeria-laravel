@@ -28,23 +28,22 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        // Validación de los datos
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'type_product_id' => 'required|exists:type_products,id',
-        ]);
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'type_product_id' => 'required|exists:typeproducts,id',
+        'business_rule_id' => 'nullable|exists:business_rules,id', // opcional
+    ]);
 
-        // Crear la categoría
-        $category = Category::create([
-            'name' => $validatedData['name'],
-            'type_product_id' => $validatedData['type_product_id'],
-        ]);
+    $category = Category::create([
+        'name' => $validatedData['name'],
+        'type_product_id' => $validatedData['type_product_id'],
+        'business_rule_id' => $validatedData['business_rule_id'] ?? null,
+    ]);
 
-        // Retornar respuesta
-        return response()->json([
-            'message' => 'Categoría creada correctamente',
-            'category' => $category
-        ], 201);
+    return response()->json([
+        'message' => 'Categoría creada correctamente',
+        'category' => $category
+    ], 201);
     }
 
     /**
