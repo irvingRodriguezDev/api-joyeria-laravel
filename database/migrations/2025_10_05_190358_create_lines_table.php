@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('price', 12, 2)->default(0);
             // porcentaje de descuento (ej: 15.50)
             $table->decimal('percent_discount', 5, 2)->default(0);
+            $table->foreignId('shop_id')->constrained('shops')->onDelete('cascade');
             $table->timestamps();
         });
     }

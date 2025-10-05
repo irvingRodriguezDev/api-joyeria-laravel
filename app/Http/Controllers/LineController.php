@@ -13,7 +13,7 @@ class LineController extends Controller
      */
     public function index()
     {
-        $lines = Line::orderBy('name')->paginate(15); // o ->get()
+        $lines = Line::all(); // o ->get()
         return response()->json($lines);
     }
 
@@ -28,8 +28,18 @@ class LineController extends Controller
             'price' => 'required|numeric|min:0',
             'percent_discount' => 'nullable|numeric|between:0,100',
         ]);
+        $shop = $request->user()->shop; // objeto Shop
+        $shopId = $shop?->id;
 
-        $line = Line::create($validated);
+        $line = Line::create([
+            'name' => $request->name,
+            'price_purchase' => $request->price_purchase,
+            'price' => $request->price,
+            'percent_discount' => $request->percent_discount,
+            'shop_id' => $shopId,
+        ]);
+
+        $line->save();
 
         return response()->json([
             'message' => 'Line creada correctamente',

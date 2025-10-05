@@ -33,12 +33,15 @@ class CategoryController extends Controller
         'type_product_id' => 'required|exists:type_products,id',
         'business_rule_id' => 'nullable|exists:business_rules,id', // opcional
     ]);
-
+$shop = $request->user()->shop; // objeto Shop
+$shopId = $shop?->id;
     $category = Category::create([
         'name' => $validatedData['name'],
         'type_product_id' => $validatedData['type_product_id'],
         'business_rule_id' => $validatedData['business_rule_id'] ?? null,
+        'shop_id' => $shopId
     ]);
+    $category->save();
 
     return response()->json([
         'message' => 'Categoría creada correctamente',

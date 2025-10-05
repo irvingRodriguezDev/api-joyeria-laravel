@@ -15,6 +15,7 @@ return new class extends Migration
         $table->id();
         $table->string('name');
         $table->foreignId('type_product_id')->constrained('type_products')->onDelete('cascade');
+        $table->foreignId('shop_id')->constrained('shops')->onDelete('cascade');
         $table->foreignId('business_rule_id')->nullable()->constrained('business_rules')->nullOnDelete();
         $table->timestamps();
     });

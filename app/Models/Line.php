@@ -16,6 +16,7 @@ class Line extends Model
         'price_purchase',
         'price',
         'percent_discount',
+        'shop_id',
     ];
 
     protected $casts = [
