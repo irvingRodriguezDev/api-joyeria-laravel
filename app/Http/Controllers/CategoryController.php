@@ -30,7 +30,7 @@ class CategoryController extends Controller
     {
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'type_product_id' => 'required|exists:typeproducts,id',
+        'type_product_id' => 'required|exists:type_products,id',
         'business_rule_id' => 'nullable|exists:business_rules,id', // opcional
     ]);
 

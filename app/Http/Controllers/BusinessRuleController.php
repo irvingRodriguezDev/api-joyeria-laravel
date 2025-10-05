@@ -11,7 +11,7 @@ class BusinessRuleController extends Controller
     public function index()
     {
         $rules = BusinessRule::all();
-        return response()->json($rules);
+        return response()->json(['rules' => $rules]);
     }
 
     // Crear nueva regla
