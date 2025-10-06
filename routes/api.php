@@ -11,6 +11,7 @@ use App\Http\Controllers\TypeProductController;
 use App\Http\Controllers\BusinessRuleController;
 use App\Http\Controllers\LineController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,10 @@ Route::middleware('auth:sanctum')->group(function () {
     //products
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products', [ProductController::class, 'index']);
+
+    //clients
+    Route::post('/clients', [CustomerController::class, 'store']);
+    Route::get('/clients', [CustomerController::class, 'index']);
 
     //typesProducts
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 
