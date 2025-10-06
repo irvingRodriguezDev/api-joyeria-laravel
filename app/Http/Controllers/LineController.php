@@ -50,8 +50,14 @@ class LineController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Line $line)
+    public function show($id)
     {
+        $line = Line::find($id);
+    
+        if (!$line) {
+            return response()->json(['message' => 'Línea no encontrada'], 404);
+        }
+    
         return response()->json($line);
     }
 

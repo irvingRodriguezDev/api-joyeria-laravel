@@ -11,7 +11,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::with('typeProduct', 'businessRule')->get();
         return response()->json($categories);
     }
 
@@ -28,34 +28,41 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'type_product_id' => 'required|exists:type_products,id',
-        'business_rule_id' => 'nullable|exists:business_rules,id', // opcional
-    ]);
-$shop = $request->user()->shop; // objeto Shop
-$shopId = $shop?->id;
-    $category = Category::create([
-        'name' => $validatedData['name'],
-        'type_product_id' => $validatedData['type_product_id'],
-        'business_rule_id' => $validatedData['business_rule_id'] ?? null,
-        'shop_id' => $shopId
-    ]);
-    $category->save();
-
-    return response()->json([
-        'message' => 'Categoría creada correctamente',
-        'category' => $category
-    ], 201);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'type_product_id' => 'required|exists:type_products,id',
+            'business_rule_id' => 'nullable|exists:business_rules,id', // opcional
+        ]);
+        $shop = $request->user()->shop; // objeto Shop
+        $shopId = $shop?->id;
+        $category = Category::create([
+            'name' => $validatedData['name'],
+            'type_product_id' => $validatedData['type_product_id'],
+            'business_rule_id' => $validatedData['business_rule_id'] ?? null,
+            'shop_id' => $shopId
+        ]);
+        $category->save();
+    
+        return response()->json([
+            'message' => 'Categoría creada correctamente',
+            'category' => $category
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
-    }
+        $category = Category::with('typeProduct', 'businessRule')->find($id);
+        
+        if (!$category) {
+            return response()->json(['message' => 'Categoría no encontrada'], 404);
+        }
+    
+        return response()->json($category);
+        }
+
 
     /**
      * Show the form for editing the specified resource.
