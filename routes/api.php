@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TypeProductController;
 use App\Http\Controllers\BusinessRuleController;
 use App\Http\Controllers\LineController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -59,6 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/lines', [LineController::class, 'store']);
     Route::get('/lines',  [LineController::class, 'index']);
     Route::get('/lines/{id}',  [LineController::class, 'show']);
+
+    //products
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/products', [ProductController::class, 'index']);
 
     //typesProducts
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 
