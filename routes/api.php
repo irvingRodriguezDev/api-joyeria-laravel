@@ -73,6 +73,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //sales
     Route::post('/sales', [SaleController::class, 'store']);
+    Route::get('/sales', [SaleController::class, 'index']);
+    Route::get('/sales/{id}/ticket', [SaleController::class, 'generateTicket']);
+
 
     //typesProducts
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 

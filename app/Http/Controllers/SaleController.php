@@ -9,9 +9,14 @@ use App\Models\SaleDetail;
 use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class SaleController extends Controller
 {
+    public function index(){
+        $sales = Sale::with('details', 'payments', 'client', 'branch')->get();
+        return response()->json($sales);
+    }
+
     public function store(SaleStoreRequest $request): JsonResponse
     {
     $data = $request->validated();
@@ -113,4 +118,20 @@ class SaleController extends Controller
         ], 500);
     }
     }
+    public function generateTicket($id)
+    {
+        // Traemos la venta con todas sus relaciones
+        $sale = Sale::with('details.product', 'payments', 'client', 'branch')
+                    ->findOrFail($id);
+        // return $sale;
+        // Cargamos la vista Blade con los datos de la venta
+        $pdf = Pdf::loadView('tickets.sale', compact('sale'));
+    
+        // Opcional: establecer tamaño tipo ticket térmico (80mm)
+        $pdf->setPaper([0, 0, 226.77, 600], 'portrait'); // 80mm aprox de ancho
+    
+        // Mostrar el PDF en el navegador
+        return $pdf->stream("ticket_venta_{$sale->id}.pdf");
+    }
+
 }
