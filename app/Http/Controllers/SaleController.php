@@ -135,7 +135,7 @@ class SaleController extends Controller
     }
 
     public function showSale($id){
-              $sale = Sale::with('details.product', 'payments', 'client', 'branch')
+              $sale = Sale::with('details.product', 'details.product.line', 'details.product.category', 'payments', 'client', 'branch')
                     ->findOrFail($id);
                     return response()->json($sale);
     }
