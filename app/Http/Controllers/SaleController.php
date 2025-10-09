@@ -134,4 +134,10 @@ class SaleController extends Controller
         return $pdf->stream("ticket_venta_{$sale->id}.pdf");
     }
 
+    public function showSale($id){
+              $sale = Sale::with('details.product', 'payments', 'client', 'branch')
+                    ->findOrFail($id);
+                    return response()->json($sale);
+    }
+
 }
