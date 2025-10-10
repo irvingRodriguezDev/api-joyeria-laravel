@@ -14,6 +14,23 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function ProductsByStatus($id)
+    {
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])
+            ->where('status_id', $id)
+            ->get();
+    
+        return response()->json($products);
+    }
+
+    public function ProductsAvailablePerBranch($id){
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])
+            ->where('status_id', 2)
+            ->where('branch_id', $id)
+            ->get();
+        return response()->json($products);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
