@@ -10,7 +10,7 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        $customers = Customer::with(['branch', 'shop'])->get();
+        $customers = Customer::with(['branch', 'shop'])->paginate();
         return response()->json($customers);
     }
 

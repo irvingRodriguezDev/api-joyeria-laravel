@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //products
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
     Route::get('/productsAvailablePerBranch/{id}', [ProductController::class, 'ProductsAvailablePerBranch']);

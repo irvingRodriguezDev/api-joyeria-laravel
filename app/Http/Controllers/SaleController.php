@@ -13,7 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class SaleController extends Controller
 {
     public function index(){
-        $sales = Sale::with('details', 'payments', 'client', 'branch')->get();
+        $sales = Sale::with('details', 'payments', 'client', 'branch')->orderBy('folio', 'desc')->paginate();
         return response()->json($sales);
     }
 

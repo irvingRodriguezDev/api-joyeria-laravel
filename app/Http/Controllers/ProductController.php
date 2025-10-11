@@ -10,7 +10,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->get();
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->paginate();
         return response()->json($products);
     }
 
@@ -70,9 +70,20 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
-    public function show(Product $product)
+    public function show($id)
     {
-        $product->load(['category', 'line', 'branch', 'shop', 'status']);
+        $product = Product::with([
+            'category:id,name',
+            'line:id,name',
+            'branch:id,branch_name',
+            'shop:id,name',
+            'status:id,name',
+            'saleDetails:id,product_id,sale_id,quantity,final_price',
+            'saleDetails.sale:id,client_id,total,created_at,folio,paid_out',
+            'saleDetails.sale.client:id,name,lastname,phone'
+        ])
+        ->findOrFail($id);
+
         return response()->json($product);
     }
 
