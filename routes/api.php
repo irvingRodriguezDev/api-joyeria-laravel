@@ -51,21 +51,26 @@ Route::middleware('auth:sanctum')->group(function () {
     // Se movió aquí y se quitó el prefijo 'auth'
     Route::post('/branches', [BranchController::class, 'store']); 
     Route::get('/branches', [BranchController::class, 'index']); 
+    Route::delete('/branches/{id}', [BranchController::class, 'delete']);
     //businessRule
     Route::post('/business-rules', [BusinessRuleController::class, 'store']);
     Route::get('/business-rules', [BusinessRuleController::class, 'index']);
+    Route::delete('/business-rules/{id}', [BusinessRuleController::class, 'destroy']);
     //categories
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/category/{id}', [CategoryController::class, 'show']);
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy']);
     //lineas
     Route::post('/lines', [LineController::class, 'store']);
     Route::get('/lines',  [LineController::class, 'index']);
     Route::get('/lines/{id}',  [LineController::class, 'show']);
+    Route::delete('/lines/{id}',  [LineController::class, 'destroy']);
 
     //products
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/productsNoPaginate', [ProductController::class, 'indexNoPaginate']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
@@ -74,12 +79,17 @@ Route::middleware('auth:sanctum')->group(function () {
     //clients
     Route::post('/clients', [CustomerController::class, 'store']);
     Route::get('/clients', [CustomerController::class, 'index']);
+    Route::get('/all-clients', [CustomerController::class, 'indexPerBranch']);
 
     //sales
     Route::post('/sales', [SaleController::class, 'store']);
     Route::get('/sales', [SaleController::class, 'index']);
     Route::get('/sales/{id}', [SaleController::class, 'showSale']);
     Route::get('/sales/{id}/ticket', [SaleController::class, 'generateTicket']);
+    Route::get('/ventas/hoy', [SaleController::class, 'totalVendidoHoy']);
+    Route::get('/ventas/semana', [SaleController::class, 'totalVendidoSemana']);
+    Route::get("/ventas/mes", [SaleController::class, 'totalVendidoMes']);
+
 
 
     //typesProducts

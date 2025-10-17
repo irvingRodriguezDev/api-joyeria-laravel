@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('shop_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->decimal('positive_balance', 10, 2)->default(0);
             $table->timestamps();
+             $table->softDeletes();
         });
     }
 

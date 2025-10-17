@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('percent_discount', 5, 2)->default(0);
             $table->foreignId('shop_id')->constrained('shops')->onDelete('cascade');
             $table->timestamps();
+             $table->softDeletes();
         });
     }
 

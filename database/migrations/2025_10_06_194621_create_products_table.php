@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('price_with_discount', 10, 2)->nullable();
             $table->timestamps();
+             $table->softDeletes();
         });
     }
 

@@ -8,9 +8,17 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::with(['branch', 'shop'])->paginate();
+        $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
+        $page = $request->input('page', 1); // número de página
+        
+        $customers = Customer::with(['branch', 'shop'])->paginate($rowsPerPage, ['*'], 'page', $page);
+        return response()->json($customers);
+    }
+
+    public function indexPerBranch(Request $request){
+        $customers = Customer::with(['branch', 'shop'])->get();
         return response()->json($customers);
     }
 

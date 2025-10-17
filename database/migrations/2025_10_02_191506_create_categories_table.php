@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('shop_id')->constrained('shops')->onDelete('cascade');
             $table->foreignId('business_rule_id')->nullable()->constrained('business_rules')->nullOnDelete();
             $table->timestamps();
+             $table->softDeletes();
         });
     }
 

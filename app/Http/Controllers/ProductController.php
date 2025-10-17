@@ -8,11 +8,23 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->paginate();
+        $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
+        $page = $request->input('page', 1); // número de página
+    
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])
+            ->paginate($rowsPerPage, ['*'], 'page', $page);
+    
         return response()->json($products);
     }
+
+    public function indexNoPaginate(Request $request)
+    {
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->get();
+        return response()->json($products);
+    }
+
 
     public function ProductsByStatus($id)
     {

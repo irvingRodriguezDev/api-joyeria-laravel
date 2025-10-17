@@ -17,6 +17,7 @@ return new class extends Migration
         $table->string('multiplicator');
         $table->string('percent_discount');
         $table->timestamps();
+         $table->softDeletes();
     });
     }
 

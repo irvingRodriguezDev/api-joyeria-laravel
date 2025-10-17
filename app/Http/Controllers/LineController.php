@@ -84,11 +84,13 @@ class LineController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Line $line)
+    public function destroy($id)
     {
+        $line = Line::findOrFail($id);
         $line->delete();
+
         return response()->json([
-            'message' => 'Line eliminada correctamente'
-        ], Response::HTTP_NO_CONTENT);
+            'message' => 'La linea ha sido eliminada correctamente'
+        ]);
     }
 }

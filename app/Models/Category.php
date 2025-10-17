@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\BusinessRule;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Category extends Model
 {
-
+    use SoftDeletes;
     protected $fillable = ['name', 'type_product_id', 'business_rule_id', 'shop_id'];
 
     public function typeProduct()

@@ -28,7 +28,7 @@ class StateSeeder extends Seeder
             ['name' => 'Hidalgo'],
             ['name' => 'Jalisco'],
             ['name' => 'Estado de México'],
-            ['name' => 'Cdmx'],
+            ['name' => 'CDMX'],
             ['name' => 'Michoacán'],
             ['name' => 'Morelos'],
             ['name' => 'Nayarit'],

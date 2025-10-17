@@ -10,10 +10,17 @@ use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+
 class SaleController extends Controller
 {
-    public function index(){
-        $sales = Sale::with('details', 'payments', 'client', 'branch')->orderBy('folio', 'desc')->paginate();
+    public function index(Request $request){
+                $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
+        $page = $request->input('page', 1); // número de página
+        $sales = Sale::with('details', 'payments', 'client', 'branch')
+        ->orderBy('folio', 'desc')
+        ->paginate($rowsPerPage, ['*'], 'page', $page);
         return response()->json($sales);
     }
 
@@ -138,6 +145,46 @@ class SaleController extends Controller
               $sale = Sale::with('details.product', 'details.product.line', 'details.product.category', 'payments', 'client', 'branch')
                     ->findOrFail($id);
                     return response()->json($sale);
+    }
+
+    public function totalVendidoHoy()
+    {
+        $hoy = Carbon::today();
+        $mañana = Carbon::tomorrow();
+
+        $total = Sale::where('created_at', '>=', $hoy)
+                     ->where('created_at', '<', $mañana)
+                     ->sum('total'); // o 'paid_out' según necesites
+
+        return response()->json([
+            'total_vendido_hoy' => $total
+        ]);
+    }
+
+    public function totalVendidoSemana()
+    {
+        $inicioSemana = Carbon::now()->startOfWeek(); // lunes 00:00
+        $finSemana = Carbon::now()->endOfWeek();     // domingo 23:59:59
+        
+        $total = Sale::whereBetween('created_at', [$inicioSemana, $finSemana])
+                     ->sum('total'); // o 'paid_out'
+        
+        return response()->json([
+            'total_vendido_semana' => $total
+        ]);
+    }
+
+    public function totalVendidoMes()
+    {
+        $inicioMes = Carbon::now()->startOfMonth(); // primer día del mes 00:00
+        $finMes = Carbon::now()->endOfMonth();     // último día del mes 23:59:59
+        
+        $total = Sale::whereBetween('created_at', [$inicioMes, $finMes])
+                     ->sum('total'); // o 'paid_out'
+        
+        return response()->json([
+            'total_vendido_mes' => $total
+        ]);
     }
 
 }

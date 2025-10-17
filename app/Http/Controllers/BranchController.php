@@ -37,4 +37,13 @@ class BranchController extends Controller
         }
     }
 
+    public function delete($id)
+    {
+        $branch = Branch::findOrFail($id); // Busca la sucursal
+        $branch->delete(); // Soft delete si el modelo usa SoftDeletes
+    
+        return response()->json([
+            "message" => "La sucursal se ha eliminado correctamente"
+        ], 200);
+    }
 }

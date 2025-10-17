@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('state_id')->constrained('states')->onDelete('cascade');
             $table->foreignId('municipality_id')->constrained('municipalities')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
