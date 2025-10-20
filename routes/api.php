@@ -90,6 +90,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ventas/semana', [SaleController::class, 'totalVendidoSemana']);
     Route::get("/ventas/mes", [SaleController::class, 'totalVendidoMes']);
 
+    //Dashboard
+    Route::get('/total_gramos', [ProductController::class, 'totalGramosProductos']);
+    Route::get('/total_gramos_existentes', [ProductController::class, 'totalGramosProductosExistentes']);
+    Route::get('/total_dinero_gramos', [ProductController::class, 'totalMoneyGramosProductos']);
+    Route::get('/total_dinero_gramos_existentes', [ProductController::class, 'totalMoneyGramosProductosExistentes']);
+
 
 
     //typesProducts

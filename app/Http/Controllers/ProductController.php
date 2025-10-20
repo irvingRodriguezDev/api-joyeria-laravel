@@ -14,6 +14,7 @@ class ProductController extends Controller
         $page = $request->input('page', 1); // número de página
     
         $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])
+            ->orderBy('created_at', 'desc')
             ->paginate($rowsPerPage, ['*'], 'page', $page);
     
         return response()->json($products);
@@ -124,5 +125,55 @@ class ProductController extends Controller
     {
         $product->delete();
         return response()->json(null, 204);
+    }
+
+    //total de gramos
+    public function totalGramosProductos()
+    {
+        $totalGramos = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->sum('weight');
+    
+        return response()->json([
+            'total_gramos' => $totalGramos
+        ]);
+        
+    }
+    public function totalGramosProductosExistentes()
+    {
+        $totalGramosExistentes = Product::whereNotNull('weight') // solo productos con gramos
+        ->where('status_id', 2)  
+        ->where('deleted_at', null)  
+        ->sum('weight');
+    
+        return response()->json([
+            'total_gramos_existentes' => $totalGramosExistentes
+        ]);
+        
+    }
+
+    //funciones de gramos en dinero
+    public function totalMoneyGramosProductos()
+    {
+        $totalDineroGramos = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->sum('price');
+    
+        return response()->json([
+            'total_dinero_gramos' => $totalDineroGramos
+        ]);
+        
+    }
+    public function totalMoneyGramosProductosExistentes()
+    {
+        $totalDineroGramos = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->where('status_id', 2)
+            ->sum('price');
+    
+        return response()->json([
+            'total_dinero_gramos' => $totalDineroGramos
+        ]);
+        
     }
 }

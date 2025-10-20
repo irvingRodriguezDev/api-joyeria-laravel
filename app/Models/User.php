@@ -60,6 +60,6 @@ class User extends Authenticatable
     }
     public function branch()
     {
-        return $this->belognsTo(Branch::class);
+        return $this->belongsTo(Branch::class);
     }
 }
