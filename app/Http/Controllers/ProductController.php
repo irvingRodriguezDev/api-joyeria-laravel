@@ -127,8 +127,8 @@ class ProductController extends Controller
         return response()->json(null, 204);
     }
 
-    //total de gramos
-    public function totalGramosProductos()
+    //total de gramos general
+    public function totalGramos()
     {
         $totalGramos = Product::whereNotNull('weight') // solo productos con gramos
             ->where('deleted_at', null)
@@ -139,7 +139,20 @@ class ProductController extends Controller
         ]);
         
     }
-    public function totalGramosProductosExistentes()
+
+    public function totalDineroGramos()
+    {
+        $totalDineroGramos = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->sum('price');
+    
+        return response()->json([
+            'total_dinero_gramos' => $totalDineroGramos
+        ]);
+        
+    }
+    //productosExistentes
+    public function totalGramosExistentes()
     {
         $totalGramosExistentes = Product::whereNotNull('weight') // solo productos con gramos
         ->where('status_id', 2)  
@@ -152,28 +165,62 @@ class ProductController extends Controller
         
     }
 
-    //funciones de gramos en dinero
-    public function totalMoneyGramosProductos()
+    public function TotalDineroGramosExistentes()
     {
-        $totalDineroGramos = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_gramos' => $totalDineroGramos
-        ]);
-        
-    }
-    public function totalMoneyGramosProductosExistentes()
-    {
-        $totalDineroGramos = Product::whereNotNull('weight') // solo productos con gramos
+        $totalDineroGramosExistentes = Product::whereNotNull('weight') // solo productos con gramos
             ->where('deleted_at', null)
             ->where('status_id', 2)
             ->sum('price');
     
         return response()->json([
-            'total_dinero_gramos' => $totalDineroGramos
+            'total_dinero_gramos_existentes' => $totalDineroGramosExistentes
         ]);
         
     }
+
+    //totales gramos dañados
+    public function totalGramosDanados(){
+            $totalGramosDanados = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->where('status_id', 4)
+            ->sum('weight');
+    
+        return response()->json([
+            'total_gramos_danados' => $totalGramosDanados
+        ]);
+    }
+    public function totalDineroGramosDanados(){
+            $totalDineroGramosDanados = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->where('status_id', 4)
+            ->sum('price');
+    
+        return response()->json([
+            'total_dinero_gramos_danados' => $totalDineroGramosDanados
+        ]);
+    }
+
+    //productos transpasados
+    public function totalGramosTraspasados(){
+            $totalGramosTraspasados = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->where('status_id', 3)
+            ->sum('weight');
+    
+        return response()->json([
+            'total_gramos_traspasados' => $totalGramosTraspasados
+        ]);
+    }
+    public function totalDineroGramosTraspasados(){
+            $totalDineroGramosTraspasados = Product::whereNotNull('weight') // solo productos con gramos
+            ->where('deleted_at', null)
+            ->where('status_id', 3)
+            ->sum('price');
+    
+        return response()->json([
+            'total_dinero_gramos_traspasados' => $totalDineroGramosTraspasados
+        ]);
+    }
+
+
 }

@@ -91,10 +91,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("/ventas/mes", [SaleController::class, 'totalVendidoMes']);
 
     //Dashboard
-    Route::get('/total_gramos', [ProductController::class, 'totalGramosProductos']);
-    Route::get('/total_gramos_existentes', [ProductController::class, 'totalGramosProductosExistentes']);
-    Route::get('/total_dinero_gramos', [ProductController::class, 'totalMoneyGramosProductos']);
-    Route::get('/total_dinero_gramos_existentes', [ProductController::class, 'totalMoneyGramosProductosExistentes']);
+    Route::get('/total_gramos', [ProductController::class, 'totalGramos']);
+    Route::get('/total_dinero_gramos', [ProductController::class, 'totalDineroGramos']);
+    Route::get('/total_gramos_existentes', [ProductController::class, 'totalGramosExistentes']);
+    Route::get('/total_dinero_gramos_existentes', [ProductController::class, 'TotalDineroGramosExistentes']);
+    Route::get('/total_gramos_traspasados', [ProductController::class, 'totalGramosTraspasados']);
+    Route::get('/total_dinero_gramos_traspasados',  [ProductController::class, 'totalDineroGramosTraspasados']);
+    Route::get('/total_gramos_danados', [ProductController::class, 'totalGramosDanados']);
+    Route::get('/total_dinero_gramos_danados', [ProductController::class, 'totalDineroGramosDanados']);
 
 
 
