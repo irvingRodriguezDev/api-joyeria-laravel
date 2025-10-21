@@ -147,43 +147,47 @@ class SaleController extends Controller
                     return response()->json($sale);
     }
 
-    public function totalVendidoHoy()
+    public function totalVendidoHoy(): JsonResponse
     {
-        $hoy = Carbon::today();
-        $mañana = Carbon::tomorrow();
-
-        $total = Sale::where('created_at', '>=', $hoy)
-                     ->where('created_at', '<', $mañana)
-                     ->sum('total'); // o 'paid_out' según necesites
+        $total = Sale::whereDate('created_at', Carbon::today())->sum('total');
 
         return response()->json([
-            'total_vendido_hoy' => $total
+            'total_vendido_hoy' => $total,
+            'fecha' => Carbon::today()->toDateString()
         ]);
     }
 
-    public function totalVendidoSemana()
+    public function totalVendidoSemana(): JsonResponse
     {
-        $inicioSemana = Carbon::now()->startOfWeek(); // lunes 00:00
-        $finSemana = Carbon::now()->endOfWeek();     // domingo 23:59:59
-        
+        $inicioSemana = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        $finSemana = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+
         $total = Sale::whereBetween('created_at', [$inicioSemana, $finSemana])
-                     ->sum('total'); // o 'paid_out'
-        
+                     ->sum('total');
+
         return response()->json([
-            'total_vendido_semana' => $total
+            'total_vendido_semana' => $total,
+            'rango' => [
+                'inicio' => $inicioSemana->toDateString(),
+                'fin' => $finSemana->toDateString(),
+            ]
         ]);
     }
 
-    public function totalVendidoMes()
+    public function totalVendidoMes(): JsonResponse
     {
-        $inicioMes = Carbon::now()->startOfMonth(); // primer día del mes 00:00
-        $finMes = Carbon::now()->endOfMonth();     // último día del mes 23:59:59
-        
+        $inicioMes = Carbon::now()->startOfMonth();
+        $finMes = Carbon::now()->endOfMonth();
+
         $total = Sale::whereBetween('created_at', [$inicioMes, $finMes])
-                     ->sum('total'); // o 'paid_out'
-        
+                     ->sum('total');
+
         return response()->json([
-            'total_vendido_mes' => $total
+            'total_vendido_mes' => $total,
+            'rango' => [
+                'inicio' => $inicioMes->toDateString(),
+                'fin' => $finMes->toDateString(),
+            ]
         ]);
     }
 

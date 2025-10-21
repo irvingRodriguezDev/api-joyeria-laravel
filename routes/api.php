@@ -99,7 +99,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/total_dinero_gramos_traspasados',  [ProductController::class, 'totalDineroGramosTraspasados']);
     Route::get('/total_gramos_danados', [ProductController::class, 'totalGramosDanados']);
     Route::get('/total_dinero_gramos_danados', [ProductController::class, 'totalDineroGramosDanados']);
-
+    Route::get('/total_piezas', [ProductController::class, 'totalPiezas']);
+    Route::get('/total_dinero_piezas', [ProductController::class, 'totalDineroPiezas']);
+    Route::get('/total_piezas_existentes', [ProductController::class, 'totalPiezasExistentes']);
+    Route::get('/total_dinero_piezas_existentes', [ProductController::class, 'TotalDineroPiezasExistentes']);
+    Route::get('/total_piezas_traspasados', [ProductController::class, 'totalPiezasTraspasados']);
+    Route::get('/total_dinero_piezas_traspasados',  [ProductController::class, 'totalDineroPiezasTraspasados']);
+    Route::get('/total_piezas_danados', [ProductController::class, 'totalPiezasDanados']);
+    Route::get('/total_dinero_piezas_danados', [ProductController::class, 'totalDineroPiezasDanados']);
 
 
     //typesProducts
