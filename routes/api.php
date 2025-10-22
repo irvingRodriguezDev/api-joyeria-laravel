@@ -13,6 +13,7 @@ use App\Http\Controllers\LineController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\DepartureController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -108,13 +109,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/total_piezas_danados', [ProductController::class, 'totalPiezasDanados']);
     Route::get('/total_dinero_piezas_danados', [ProductController::class, 'totalDineroPiezasDanados']);
 
+    //departure
+    Route::get('/departures', [DepartureController::class, 'index']);
+    Route::post('/departures', [DepartureController::class, 'store']);
+    Route::get('/departures/{id}', [DepartureController::class, 'show']);
+    Route::delete('/departures/{id}', [DepartureController::class, 'destroy']);
+
 
     //typesProducts
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 
     //users
     Route::get('/users', [UserController::class, 'index']); 
-
-    
 
 
 });
