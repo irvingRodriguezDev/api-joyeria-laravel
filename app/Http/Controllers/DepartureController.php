@@ -8,12 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
 
 class DepartureController extends Controller
 {
     public function index()
     {
-        $departures = Departure::with(['branch', 'user', 'details.product'])->get();
+        $departures = Departure::with(['branch', 'user', 'details.product'])->orderBy('id', 'desc')->paginate();
         return response()->json($departures);
     }
 
@@ -75,7 +77,7 @@ class DepartureController extends Controller
 
     public function show($id)
     {
-        $departure = Departure::with(['branch', 'user', 'details.product'])->findOrFail($id);
+        $departure = Departure::with('details.product', 'details.product.line', 'details.product.category', 'branch')->findOrFail($id);
         return response()->json($departure);
     }
 
@@ -85,5 +87,18 @@ class DepartureController extends Controller
         $departure->delete();
 
         return response()->json(['message' => 'Salida eliminada correctamente']);
+    }
+
+
+    public function generatePDF($id)
+    {
+        $departure = Departure::with('details.product', 'details.product.line', 'details.product.category', 'branch')->findOrFail($id);
+        $pdf = Pdf::loadView('departures.pdf', compact('departure'))
+            ->setPaper('letter', 'portrait');
+    
+        return new Response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="Salida-'.$departure->id.'.pdf"',
+        ]);
     }
 }

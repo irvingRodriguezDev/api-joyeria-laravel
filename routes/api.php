@@ -75,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
+    Route::get('/productsSelect', [ProductController::class, 'productsForSelect']);
     Route::get('/productsAvailablePerBranch/{id}', [ProductController::class, 'ProductsAvailablePerBranch']);
 
     //clients
@@ -114,7 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/departures', [DepartureController::class, 'store']);
     Route::get('/departures/{id}', [DepartureController::class, 'show']);
     Route::delete('/departures/{id}', [DepartureController::class, 'destroy']);
-
+    Route::get('/departures/{id}/pdf', [DepartureController::class, 'generatePDF']);
 
     //typesProducts
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 

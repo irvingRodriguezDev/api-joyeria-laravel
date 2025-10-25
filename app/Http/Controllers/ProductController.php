@@ -22,7 +22,13 @@ class ProductController extends Controller
 
     public function indexNoPaginate(Request $request)
     {
-        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->get();
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->where('status_id', 2)->get();
+        return response()->json($products);
+    }
+
+    public function productsForSelect(Request $request)
+    {
+        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->where('status_id', 2)->get();
         return response()->json($products);
     }
 
