@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\DepartureController;
+use App\Http\Controllers\InventoryReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -121,6 +122,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 
     //users
     Route::get('/users', [UserController::class, 'index']); 
+
+    //reports
+    Route::post('/reports/inventory', [InventoryReportController::class, 'generatePdf']);
 
 
 });
