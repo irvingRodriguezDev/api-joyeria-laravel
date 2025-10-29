@@ -15,6 +15,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\DepartureController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\CashCutController;
+use App\Http\Controllers\ReporteVentasController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -125,6 +127,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //reports
     Route::post('/reports/inventory', [InventoryReportController::class, 'generatePdf']);
+
+    //boxcut
+    Route::post('reports/cashcut/range', [CashCutController::class, 'rangePdf']);
+    Route::post('reports/cashcut/daily-ticket', [CashCutController::class, 'dailyTicket']);
+
+    //reporte de ventas
+    Route::post('/reports/sales-range', [ReporteVentasController::class, 'ventasPorRango']);
+
 
 
 });
