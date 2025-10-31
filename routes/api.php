@@ -129,8 +129,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reports/inventory', [InventoryReportController::class, 'generatePdf']);
 
     //boxcut
-    Route::post('reports/cashcut/range', [CashCutController::class, 'rangePdf']);
-    Route::post('reports/cashcut/daily-ticket', [CashCutController::class, 'dailyTicket']);
+    Route::post('/reports/cashcut/range', [CashCutController::class, 'rangePdf']);
+    Route::post('/reports/cashcut/daily-ticket', [CashCutController::class, 'dailyTicket']);
 
     //reporte de ventas
     Route::post('/reports/sales-range', [ReporteVentasController::class, 'ventasPorRango']);
