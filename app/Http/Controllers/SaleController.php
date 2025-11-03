@@ -12,9 +12,21 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Traits\AppliesBranchScope;
+use Illuminate\Support\Facades\Auth;
 
 class SaleController extends Controller
 {
+      use AppliesBranchScope;
+
+    private function respondWithScope($data)
+    {
+        return response()->json(array_merge($data, [
+            'scope' => Auth::user()->type_user === 1 ? 'global' : 'branch',
+            'branch_id' => Auth::user()->branch_id ?? null,
+        ]));
+    }
+
     public function index(Request $request){
                 $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
         $page = $request->input('page', 1); // número de página
@@ -147,48 +159,62 @@ class SaleController extends Controller
                     return response()->json($sale);
     }
 
-    public function totalVendidoHoy(): JsonResponse
-    {
-        $total = Sale::whereDate('created_at', Carbon::today())->sum('total');
+public function totalVendidoHoy(): JsonResponse
+{
+    $query = Sale::query()
+        ->whereDate('created_at', Carbon::now('America/Mexico_City')->toDateString());
 
-        return response()->json([
-            'total_vendido_hoy' => $total,
-            'fecha' => Carbon::today()->toDateString()
-        ]);
-    }
+    $this->applyBranchScope($query);
 
-    public function totalVendidoSemana(): JsonResponse
-    {
-        $inicioSemana = Carbon::now()->startOfWeek(Carbon::MONDAY);
-        $finSemana = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+    $total = $query->sum('total');
 
-        $total = Sale::whereBetween('created_at', [$inicioSemana, $finSemana])
-                     ->sum('total');
+    return $this->respondWithScope([
+        'total_vendido_hoy' => $total,
+        'fecha' => Carbon::now('America/Mexico_City')->toDateString(),
+    ]);
+}
 
-        return response()->json([
-            'total_vendido_semana' => $total,
-            'rango' => [
-                'inicio' => $inicioSemana->toDateString(),
-                'fin' => $finSemana->toDateString(),
-            ]
-        ]);
-    }
+public function totalVendidoSemana(): JsonResponse
+{
+    $inicioSemana = Carbon::now('America/Mexico_City')->startOfWeek(Carbon::MONDAY);
+    $finSemana = Carbon::now('America/Mexico_City')->endOfWeek(Carbon::SUNDAY);
 
-    public function totalVendidoMes(): JsonResponse
-    {
-        $inicioMes = Carbon::now()->startOfMonth();
-        $finMes = Carbon::now()->endOfMonth();
+    $query = Sale::query()
+        ->whereBetween('created_at', [$inicioSemana, $finSemana]);
 
-        $total = Sale::whereBetween('created_at', [$inicioMes, $finMes])
-                     ->sum('total');
+    $this->applyBranchScope($query);
 
-        return response()->json([
-            'total_vendido_mes' => $total,
-            'rango' => [
-                'inicio' => $inicioMes->toDateString(),
-                'fin' => $finMes->toDateString(),
-            ]
-        ]);
-    }
+    $total = $query->sum('total');
+
+    return $this->respondWithScope([
+        'total_vendido_semana' => $total,
+        'rango' => [
+            'inicio' => $inicioSemana->toDateString(),
+            'fin' => $finSemana->toDateString(),
+        ],
+    ]);
+}
+
+public function totalVendidoMes(): JsonResponse
+{
+    $inicioMes = Carbon::now('America/Mexico_City')->startOfMonth();
+    $finMes = Carbon::now('America/Mexico_City')->endOfMonth();
+
+    $query = Sale::query()
+        ->whereBetween('created_at', [$inicioMes, $finMes]);
+
+    $this->applyBranchScope($query);
+
+    $total = $query->sum('total');
+
+    return $this->respondWithScope([
+        'total_vendido_mes' => $total,
+        'rango' => [
+            'inicio' => $inicioMes->toDateString(),
+            'fin' => $finMes->toDateString(),
+        ],
+    ]);
+}
+
 
 }

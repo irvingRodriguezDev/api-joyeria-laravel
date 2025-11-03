@@ -5,9 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Traits\AppliesBranchScope;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
+       use AppliesBranchScope;
+    private function respondWithScope($data)
+    {
+        return response()->json(array_merge($data, [
+            'scope' => Auth::user()->type_user === 1 ? 'global' : 'branch',
+            'branch_id' => Auth::user()->branch_id ?? null,
+        ]));
+    }
     public function index(Request $request)
     {
         $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
@@ -133,175 +143,222 @@ class ProductController extends Controller
         return response()->json(null, 204);
     }
 
-    //total de gramos general
+    //total de gramos general dashboard Admin
+    // ======= 📏 TOTAL GRAMOS =======
     public function totalGramos()
     {
-        $totalGramos = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->sum('weight');
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->whereNull('deleted_at');
     
-        return response()->json([
-            'total_gramos' => $totalGramos
+        $this->applyBranchScope($query);
+    
+        return $this->respondWithScope([
+            'total_gramos' => $query->sum('weight')
         ]);
     }
+
 
     public function totalDineroGramos()
     {
-        $totalDineroGramos = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_gramos' => $totalDineroGramos
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_gramos' => $query->sum('price'),
         ]);
     }
-    //productosExistentes
+
+    // ======= 💎 GRAMOS EXISTENTES =======
     public function totalGramosExistentes()
     {
-        $totalGramosExistentes = Product::whereNotNull('weight') // solo productos con gramos
-        ->where('status_id', 2)  
-        ->where('deleted_at', null)  
-        ->sum('weight');
-    
-        return response()->json([
-            'total_gramos_existentes' => $totalGramosExistentes
-        ]);
-    }
-    public function TotalDineroGramosExistentes()
-    {
-        $totalDineroGramosExistentes = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
+        $query = Product::query()
+            ->whereNotNull('weight')
             ->where('status_id', 2)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_gramos_existentes' => $totalDineroGramosExistentes
-        ]);
-        
-    }
+            ->whereNull('deleted_at');
 
-    //totales gramos dañados
-    public function totalGramosDanados(){
-            $totalGramosDanados = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 4)
-            ->sum('weight');
-    
-        return response()->json([
-            'total_gramos_danados' => $totalGramosDanados
-        ]);
-    }
-    public function totalDineroGramosDanados(){
-            $totalDineroGramosDanados = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 4)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_gramos_danados' => $totalDineroGramosDanados
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_gramos_existentes' => $query->sum('weight'),
         ]);
     }
 
-    //productos transpasados
-    public function totalGramosTraspasados(){
-            $totalGramosTraspasados = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 3)
-            ->sum('weight');
-    
-        return response()->json([
-            'total_gramos_traspasados' => $totalGramosTraspasados
-        ]);
-    }
-    public function totalDineroGramosTraspasados(){
-            $totalDineroGramosTraspasados = Product::whereNotNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 3)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_gramos_traspasados' => $totalDineroGramosTraspasados
-        ]);
-    }
-
-    //piezas 
-        public function totalDineroPiezas()
+    public function totalDineroGramosExistentes()
     {
-        $totalDineroPiezas = Product::whereNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_piezas' => $totalDineroPiezas
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->where('status_id', 2)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_gramos_existentes' => $query->sum('price'),
         ]);
     }
-    //productosExistentes
+
+    // ======= ⚠️ GRAMOS DAÑADOS =======
+    public function totalGramosDanados()
+    {
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->where('status_id', 4)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_gramos_danados' => $query->sum('weight'),
+        ]);
+    }
+
+    public function totalDineroGramosDanados()
+    {
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->where('status_id', 4)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_gramos_danados' => $query->sum('price'),
+        ]);
+    }
+
+    // ======= 🔁 GRAMOS TRASPASADOS =======
+    public function totalGramosTraspasados()
+    {
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->where('status_id', 3)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_gramos_traspasados' => $query->sum('weight'),
+        ]);
+    }
+
+    public function totalDineroGramosTraspasados()
+    {
+        $query = Product::query()
+            ->whereNotNull('weight')
+            ->where('status_id', 3)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_gramos_traspasados' => $query->sum('price'),
+        ]);
+    }
+
+    // ======= 💍 PIEZAS =======
+    public function totalDineroPiezas()
+    {
+        $query = Product::query()
+            ->whereNull('weight')
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_piezas' => $query->sum('price'),
+        ]);
+    }
+
+    // ======= 🧮 PIEZAS EXISTENTES =======
     public function totalPiezasExistentes()
     {
-        $totalPiezasExistentes = Product::whereNull('weight') // solo productos con gramos
-        ->where('status_id', 2)  
-        ->where('deleted_at', null)  
-        ->sum('weight');
-    
-        return response()->json([
-            'total_piezas_existentes' => $totalPiezasExistentes
-        ]);
-    }
-    public function TotalDineroPiezasExistentes()
-    {
-        $totalDineroPiezasExistentes = Product::whereNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
+        $query = Product::query()
+            ->whereNull('weight')
             ->where('status_id', 2)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_piezas_existentes' => $totalDineroPiezasExistentes
-        ]);
-        
-    }
+            ->whereNull('deleted_at');
 
-    //totales gramos dañados
-    public function totalPiezasDanados(){
-            $totalPiezasDanados = Product::whereNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 4)
-            ->sum('weight');
-    
-        return response()->json([
-            'total_piezas_danados' => $totalPiezasDanados
-        ]);
-    }
-    public function totalDineroPiezasDanados(){
-            $totalDineroPiezasDanados = Product::whereNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 4)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_piezas_danados' => $totalDineroPiezasDanados
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_piezas_existentes' => $query->count(), // No tiene sentido sumar weight aquí
         ]);
     }
 
-    //productos transpasados
-    public function totalPiezasTraspasados(){
-            $totalGramosTraspasados = Product::whereNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 3)
-            ->sum('weight');
-    
-        return response()->json([
-            'total_piezas_traspasados' => $totalPiezasTraspasados
+    public function totalDineroPiezasExistentes()
+    {
+        $query = Product::query()
+            ->whereNull('weight')
+            ->where('status_id', 2)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_piezas_existentes' => $query->sum('price'),
         ]);
     }
-    public function totalDineroPiezasTraspasados(){
-            $totalDineroPiezasTraspasados = Product::whereNull('weight') // solo productos con gramos
-            ->where('deleted_at', null)
-            ->where('status_id', 3)
-            ->sum('price');
-    
-        return response()->json([
-            'total_dinero_piezas_traspasados' => $totalDineroPiezasTraspasados
+
+    // ======= ⚠️ PIEZAS DAÑADAS =======
+    public function totalPiezasDanados()
+    {
+        $query = Product::query()
+            ->whereNull('weight')
+            ->where('status_id', 4)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_piezas_danados' => $query->count(),
         ]);
     }
+
+    public function totalDineroPiezasDanados()
+    {
+        $query = Product::query()
+            ->whereNull('weight')
+            ->where('status_id', 4)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_piezas_danados' => $query->sum('price'),
+        ]);
+    }
+
+    // ======= 🔁 PIEZAS TRASPASADAS =======
+    public function totalPiezasTraspasados()
+    {
+        $query = Product::query()
+            ->whereNull('weight')
+            ->where('status_id', 3)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_piezas_traspasados' => $query->count(),
+        ]);
+    }
+
+    public function totalDineroPiezasTraspasados()
+    {
+        $query = Product::query()
+            ->whereNull('weight')
+            ->where('status_id', 3)
+            ->whereNull('deleted_at');
+
+        $this->applyBranchScope($query);
+
+        return $this->respondWithScope([
+            'total_dinero_piezas_traspasados' => $query->sum('price'),
+        ]);
+    }
+
 
 }
