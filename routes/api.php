@@ -33,6 +33,7 @@ Route::prefix('auth')->group(function () {
     
     // Inicio de sesión
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 
 /*
@@ -124,6 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/typeProducts', [TypeProductController::class, 'index']); 
     //users
     Route::get('/users', [UserController::class, 'index']); 
+    Route::post('/disableUsers/{id}', [UserController::class, 'disableUser']);
 
     //reports
     Route::post('/reports/inventory', [InventoryReportController::class, 'generatePdf']);

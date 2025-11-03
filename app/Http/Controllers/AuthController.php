@@ -96,4 +96,27 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'No se encontró una cuenta asociada a este correo.'
+            ], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'La contraseña se ha restablecido correctamente.',
+            'email' => $user->email,
+        ], 200);
+    }
 }

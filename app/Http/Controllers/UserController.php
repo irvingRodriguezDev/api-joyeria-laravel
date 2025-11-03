@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Branch;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 use DB;
 
 class UserController extends Controller
@@ -52,6 +54,40 @@ class UserController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Error al crear el usuario.', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function disableUser(Request $request, $id)
+    {
+        $admin = Auth::user();
+
+        // Solo tipo 1 (admin) puede deshabilitar
+        if ($admin->type_user_id !== 1) {
+            return response()->json([
+                'message' => 'No tienes permisos para realizar esta acción.'
+            ], 403);
+        }
+
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Usuario no encontrado.'
+            ], 404);
+        }
+
+        if ($user->deleted_at !== null) {
+            return response()->json([
+                'message' => 'El usuario ya se encuentra deshabilitado.'
+            ], 400);
+        }
+
+        $user->deleted_at = Carbon::now('America/Mexico_City');
+        $user->save();
+
+        return response()->json([
+            'message' => 'Usuario deshabilitado correctamente.',
+            'user' => $user
+        ]);
     }
 
 }
