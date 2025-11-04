@@ -5,29 +5,26 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Traits\AppliesBranchScope;
+use App\Traits\BranchScopeTrait;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-       use AppliesBranchScope;
-    private function respondWithScope($data)
-    {
-        return response()->json(array_merge($data, [
-            'scope' => Auth::user()->type_user === 1 ? 'global' : 'branch',
-            'branch_id' => Auth::user()->branch_id ?? null,
-        ]));
-    }
+     use BranchScopeTrait;
+
     public function index(Request $request)
     {
         $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
         $page = $request->input('page', 1); // número de página
     
-        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])
-            ->orderBy('created_at', 'desc')
-            ->paginate($rowsPerPage, ['*'], 'page', $page);
+        $query = Product::with(['category', 'line', 'branch', 'shop', 'status'])
+            ->orderBy('created_at', 'desc');
+        $this->applyBranchScope($query);
+        $products = $query->paginate($rowsPerPage, ['*'], 'page', $page);
     
-        return response()->json($products);
+        return $this->respondWithScope([
+            "products" => $products
+        ]);
     }
 
     public function indexNoPaginate(Request $request)
@@ -147,14 +144,13 @@ class ProductController extends Controller
     // ======= 📏 TOTAL GRAMOS =======
     public function totalGramos()
     {
-        $query = Product::query()
-            ->whereNotNull('weight')
-            ->whereNull('deleted_at');
-    
-        $this->applyBranchScope($query);
-    
-        return $this->respondWithScope([
-            'total_gramos' => $query->sum('weight')
+        $total = $this->sumWithScope(Product::class, 'weight', [
+            'deleted_at' => null,
+        ]);
+
+        return response()->json([
+            'total_gramos' => $total,
+            ...$this->getScopeType(),
         ]);
     }
 
@@ -164,11 +160,16 @@ class ProductController extends Controller
         $query = Product::query()
             ->whereNotNull('weight')
             ->whereNull('deleted_at');
-
+    
+        // 👇 Aplica el filtro de sucursal si no es admin
         $this->applyBranchScope($query);
-
+    
+        // 👇 Obtén el total
+        $total = $query->sum('price');
+    
+        // 👇 Devuelve con información del alcance (branch/global)
         return $this->respondWithScope([
-            'total_dinero_gramos' => $query->sum('price'),
+            'total_dinero_gramos' => $total,
         ]);
     }
 
@@ -181,6 +182,7 @@ class ProductController extends Controller
             ->whereNull('deleted_at');
 
         $this->applyBranchScope($query);
+        
 
         return $this->respondWithScope([
             'total_gramos_existentes' => $query->sum('weight'),
@@ -359,6 +361,5 @@ class ProductController extends Controller
             'total_dinero_piezas_traspasados' => $query->sum('price'),
         ]);
     }
-
 
 }

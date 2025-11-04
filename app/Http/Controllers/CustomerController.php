@@ -5,16 +5,32 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Traits\BranchScopeTrait;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
+   use BranchScopeTrait;
+    
     public function index(Request $request)
     {
-        $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
-        $page = $request->input('page', 1); // número de página
+        $rowsPerPage = $request->input('rowsPerPage', 10);
+        $page = $request->input('page', 1);
         
-        $customers = Customer::with(['branch', 'shop'])->paginate($rowsPerPage, ['*'], 'page', $page);
-        return response()->json($customers);
+        // Base query con relaciones
+        $query = Customer::with(['branch', 'shop'])
+            ->whereNull('deleted_at'); // buena práctica si manejas borrado lógico
+        
+        // Aplica el alcance según el tipo de usuario (admin o vendedor)
+        $this->applyBranchScope($query);
+        
+        // Pagina resultados
+        $customers = $query->paginate($rowsPerPage, ['*'], 'page', $page);
+        
+        // Retorna la respuesta con contexto
+        return $this->respondWithScope([
+            'customers' => $customers,
+        ]);
     }
 
     public function indexPerBranch(Request $request){

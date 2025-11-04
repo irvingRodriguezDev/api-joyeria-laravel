@@ -12,28 +12,26 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Traits\AppliesBranchScope;
+use App\Traits\BranchScopeTrait;
 use Illuminate\Support\Facades\Auth;
 
 class SaleController extends Controller
 {
-      use AppliesBranchScope;
+    use BranchScopeTrait;
 
-    private function respondWithScope($data)
-    {
-        return response()->json(array_merge($data, [
-            'scope' => Auth::user()->type_user === 1 ? 'global' : 'branch',
-            'branch_id' => Auth::user()->branch_id ?? null,
-        ]));
-    }
 
     public function index(Request $request){
-                $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
+
+        $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
         $page = $request->input('page', 1); // número de página
-        $sales = Sale::with('details', 'payments', 'client', 'branch')
-        ->orderBy('folio', 'desc')
-        ->paginate($rowsPerPage, ['*'], 'page', $page);
-        return response()->json($sales);
+
+        $query = Sale::with('details', 'payments', 'client', 'branch')
+        ->orderBy('folio', 'desc');
+        $this->applyBranchScope($query);
+        $sales = $query->paginate($rowsPerPage, ['*'], 'page', $page);
+        return $this->respondWithScope([
+            "sales" => $sales
+        ]);
     }
 
     public function store(SaleStoreRequest $request): JsonResponse
@@ -159,62 +157,62 @@ class SaleController extends Controller
                     return response()->json($sale);
     }
 
-public function totalVendidoHoy(): JsonResponse
-{
-    $query = Sale::query()
-        ->whereDate('created_at', Carbon::now('America/Mexico_City')->toDateString());
+    public function totalVendidoHoy(): JsonResponse
+    {
+        $query = Sale::query()
+            ->whereDate('created_at', Carbon::now('America/Mexico_City')->toDateString());
+    
+        $this->applyBranchScope($query);
+    
+        $total = $query->sum('total');
+    
+        return $this->respondWithScope([
+            'total_vendido_hoy' => $total,
+            'fecha' => Carbon::now('America/Mexico_City')->toDateString(),
+        ]);
+    }
 
-    $this->applyBranchScope($query);
+    public function totalVendidoSemana(): JsonResponse
+    {
+        $inicioSemana = Carbon::now('America/Mexico_City')->startOfWeek(Carbon::MONDAY);
+        $finSemana = Carbon::now('America/Mexico_City')->endOfWeek(Carbon::SUNDAY);
+    
+        $query = Sale::query()
+            ->whereBetween('created_at', [$inicioSemana, $finSemana]);
+    
+        $this->applyBranchScope($query);
+    
+        $total = $query->sum('total');
+    
+        return $this->respondWithScope([
+            'total_vendido_semana' => $total,
+            'rango' => [
+                'inicio' => $inicioSemana->toDateString(),
+                'fin' => $finSemana->toDateString(),
+            ],
+        ]);
+    }
 
-    $total = $query->sum('total');
-
-    return $this->respondWithScope([
-        'total_vendido_hoy' => $total,
-        'fecha' => Carbon::now('America/Mexico_City')->toDateString(),
-    ]);
-}
-
-public function totalVendidoSemana(): JsonResponse
-{
-    $inicioSemana = Carbon::now('America/Mexico_City')->startOfWeek(Carbon::MONDAY);
-    $finSemana = Carbon::now('America/Mexico_City')->endOfWeek(Carbon::SUNDAY);
-
-    $query = Sale::query()
-        ->whereBetween('created_at', [$inicioSemana, $finSemana]);
-
-    $this->applyBranchScope($query);
-
-    $total = $query->sum('total');
-
-    return $this->respondWithScope([
-        'total_vendido_semana' => $total,
-        'rango' => [
-            'inicio' => $inicioSemana->toDateString(),
-            'fin' => $finSemana->toDateString(),
-        ],
-    ]);
-}
-
-public function totalVendidoMes(): JsonResponse
-{
-    $inicioMes = Carbon::now('America/Mexico_City')->startOfMonth();
-    $finMes = Carbon::now('America/Mexico_City')->endOfMonth();
-
-    $query = Sale::query()
-        ->whereBetween('created_at', [$inicioMes, $finMes]);
-
-    $this->applyBranchScope($query);
-
-    $total = $query->sum('total');
-
-    return $this->respondWithScope([
-        'total_vendido_mes' => $total,
-        'rango' => [
-            'inicio' => $inicioMes->toDateString(),
-            'fin' => $finMes->toDateString(),
-        ],
-    ]);
-}
+    public function totalVendidoMes(): JsonResponse
+    {
+        $inicioMes = Carbon::now('America/Mexico_City')->startOfMonth();
+        $finMes = Carbon::now('America/Mexico_City')->endOfMonth();
+    
+        $query = Sale::query()
+            ->whereBetween('created_at', [$inicioMes, $finMes]);
+    
+        $this->applyBranchScope($query);
+    
+        $total = $query->sum('total');
+    
+        return $this->respondWithScope([
+            'total_vendido_mes' => $total,
+            'rango' => [
+                'inicio' => $inicioMes->toDateString(),
+                'fin' => $finMes->toDateString(),
+            ],
+        ]);
+    }
 
 
 }

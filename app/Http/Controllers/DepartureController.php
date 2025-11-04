@@ -10,13 +10,22 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
+use App\Traits\BranchScopeTrait;
 
 class DepartureController extends Controller
 {
-    public function index()
+       use BranchScopeTrait;
+    public function index(Request $request)
     {
-        $departures = Departure::with(['branch', 'user', 'details.product'])->orderBy('id', 'desc')->paginate();
-        return response()->json($departures);
+        $rowsPerPage = $request->input('rowsPerPage', 10); // valor por defecto
+        $page = $request->input('page', 1); // número de página
+        $query = Departure::with(['branch', 'user', 'details.product'])
+        ->orderBy('id', 'desc');
+        $this->applyBranchScope($query);
+        $departures = $query->paginate($rowsPerPage, ['*'], 'page', $page);
+        return $this->respondWithScope([
+            "departures" => $departures
+        ]);
     }
 
     public function store(Request $request)
