@@ -35,8 +35,12 @@ class ProductController extends Controller
 
     public function productsForSelect(Request $request)
     {
-        $products = Product::with(['category', 'line', 'branch', 'shop', 'status'])->where('status_id', 2)->get();
-        return response()->json($products);
+        $query = Product::with(['category', 'line', 'branch', 'shop', 'status'])->where('status_id', 2);
+        $this->applyBranchScope($query);
+        $products = $query->get();
+        return $this->respondWithScope([
+            "products" => $products
+        ]);
     }
 
 

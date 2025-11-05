@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Branch;
+use App\Models\Shop;
 use Illuminate\Http\Request;
 use App\Traits\BranchScopeTrait;
 use Illuminate\Support\Facades\Auth;
@@ -33,8 +35,8 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function indexPerBranch(Request $request){
-        $customers = Customer::with(['branch', 'shop'])->get();
+    public function indexPerBranch(Request $request, $id){
+        $customers = Customer::with(['branch', 'shop'])->where('branch_id', $id)->get();
         return response()->json($customers);
     }
 
@@ -46,20 +48,37 @@ class CustomerController extends Controller
             'phone' => 'nullable|string|max:20',
             'branch_id' => 'required|exists:branches,id',
         ]);
-
-        $shopId = $request->user()->shop->id ?? null;
-
+    
+        $user = $request->user();
+        $shopId = null;
+    
+        // Si es admin (type_user_id === 1)
+        if ($user->type_user_id === 1) {
+            $shopId = $user->shop->id ?? null;
+        }
+    
+        // Si es usuario de sucursal (type_user_id === 3)
+        elseif ($user->type_user_id === 3) {
+            $branch = Branch::find($user->branch_id);
+            if ($branch) {
+                $shopId = $branch->shop_id;
+            }
+        }
+    
+        // Validar que se haya obtenido una tienda
         if (!$shopId) {
             return response()->json(['error' => 'El usuario no tiene una tienda asociada.'], 422);
         }
-
+    
+        // Asignar tienda y valores adicionales
         $validated['shop_id'] = $shopId;
         $validated['positive_balance'] = 0;
-
+    
         $customer = Customer::create($validated);
-
+    
         return response()->json($customer, 201);
     }
+
 
     public function show(Customer $customer)
     {

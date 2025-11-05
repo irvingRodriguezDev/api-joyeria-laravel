@@ -85,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //clients
     Route::post('/clients', [CustomerController::class, 'store']);
     Route::get('/clients', [CustomerController::class, 'index']);
-    Route::get('/all-clients', [CustomerController::class, 'indexPerBranch']);
+    Route::get('/clients-per-branch/{id}', [CustomerController::class, 'indexPerBranch']);
 
     //sales
     Route::post('/sales', [SaleController::class, 'store']);
