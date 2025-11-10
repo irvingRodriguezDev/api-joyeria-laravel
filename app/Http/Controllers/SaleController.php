@@ -34,6 +34,37 @@ class SaleController extends Controller
         ]);
     }
 
+    public function indexByBranch(Request $request)
+    {
+        $user = $request->user();
+    
+        // Aseguramos que solo el admin pueda usar este endpoint
+        if ($user->type_user_id !== 1) {
+            return response()->json(['error' => 'No autorizado.'], 403);
+        }
+    
+        $rowsPerPage = $request->input('rowsPerPage', 10);
+        $page = $request->input('page', 1);
+        $branchId = $request->input('branch_id'); // se recibe por parámetro opcional
+    
+        $query = Sale::with(['details', 'payments', 'client', 'branch'])
+            ->orderBy('folio', 'desc');
+    
+        // Si el admin mandó un branch_id, filtramos por él
+        if (!empty($branchId)) {
+            $query->where('branch_id', $branchId);
+        }
+    
+        $sales = $query->paginate($rowsPerPage, ['*'], 'page', $page);
+    
+        return response()->json([
+            "scope" => "admin",
+            "branch_id" => $branchId,
+            "sales" => $sales
+        ]);
+    }
+
+
     public function store(SaleStoreRequest $request): JsonResponse
     {
     $data = $request->validated();

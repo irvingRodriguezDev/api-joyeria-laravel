@@ -90,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //sales
     Route::post('/sales', [SaleController::class, 'store']);
     Route::get('/sales', [SaleController::class, 'index']);
+    Route::get('/admin/sales', [SaleController::class, 'indexByBranch']);
     Route::get('/sales/{id}', [SaleController::class, 'showSale']);
     Route::get('/sales/{id}/ticket', [SaleController::class, 'generateTicket']);
     Route::get('/ventas/hoy', [SaleController::class, 'totalVendidoHoy']);

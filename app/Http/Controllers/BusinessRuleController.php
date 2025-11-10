@@ -19,7 +19,7 @@ class BusinessRuleController extends Controller
     {
         $validatedData = $request->validate([
             'operator' => 'required|string|max:255',
-            'multiplicator' => 'required|integer|max:255',
+            'multiplicator' => 'required|integer|max:100000',
             'percent_discount' => 'required|integer|max:255',
         ]);
 
