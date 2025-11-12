@@ -166,6 +166,120 @@ class SaleController extends Controller
         ], 500);
     }
     }
+    public function storeByAdmin(SaleStoreRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $user = $request->user();
+    
+        // 🔒 Validamos que solo los administradores puedan usar este endpoint
+        if ($user->type_user_id !== 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No autorizado para registrar ventas en otras sucursales.'
+            ], 403);
+        }
+    
+        // 🔹 Validamos que venga branch_id, ya que el admin debe seleccionar la sucursal
+        if (empty($data['branch_id'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Debe especificar una sucursal (branch_id) para registrar la venta.'
+            ], 422);
+        }
+    
+        DB::beginTransaction();
+    
+        try {
+            $branchId = $data['branch_id'];
+        
+            // ✅ Generar folio consecutivo por branch_id
+            $maxFolio = DB::table('sales')->where('branch_id', $branchId)->max('folio');
+            $nextFolio = ($maxFolio !== null) ? ((int)$maxFolio + 1) : 1;
+        
+            // ✅ Crear venta
+            $sale = Sale::create([
+                'client_id' => $data['client_id'],
+                'branch_id' => $branchId,
+                'user_id'   => $user->id, // admin que registró la venta
+                'folio'     => $nextFolio,
+                'total'     => $data['total'],
+                'paid_out'  => $data['paid_out'] ?? 0,
+            ]);
+        
+            // ✅ Preparar detalles
+            $detailsPayload = [];
+            $productIds = [];
+        
+            foreach ($data['productsList'] as $prod) {
+                $quantity = isset($prod['quantity']) ? (int)$prod['quantity'] : 1;
+                $finalPrice = (float)$prod['final_price'];
+                $pricePurchase = (float)$prod['price_purchase'];
+                $profit = round(($finalPrice - $pricePurchase) * $quantity, 2);
+            
+                $detailsPayload[] = [
+                    'sale_id' => $sale->id,
+                    'product_id' => $prod['product_id'],
+                    'final_price' => $finalPrice,
+                    'price_purchase' => $pricePurchase,
+                    'profit' => $profit,
+                    'quantity' => $quantity,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            
+                $productIds[] = $prod['product_id'];
+            }
+        
+            if (!empty($detailsPayload)) {
+                SaleDetail::insert($detailsPayload);
+            }
+        
+            // ✅ Marcar productos como vendidos
+            if (!empty($productIds)) {
+                DB::table('products')
+                    ->whereIn('id', $productIds)
+                    ->update([
+                        'status_id' => 1, // vendido
+                        'sold_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+            }
+        
+            // ✅ Insertar pagos si existen
+            if (!empty($data['payments'])) {
+                $paymentsPayload = [];
+                foreach ($data['payments'] as $p) {
+                    $paymentsPayload[] = [
+                        'sale_id' => $sale->id,
+                        'amount' => $p['amount'],
+                        'payment_method' => $p['payment_method'] ?? null,
+                        'reference' => $p['reference'] ?? null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                Payment::insert($paymentsPayload);
+            }
+        
+            DB::commit();
+        
+            $sale->load('details', 'payments', 'branch', 'client');
+        
+            return response()->json([
+                'success' => true,
+                'sale' => $sale,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+        
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear la venta',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function generateTicket($id)
     {
         // Traemos la venta con todas sus relaciones
