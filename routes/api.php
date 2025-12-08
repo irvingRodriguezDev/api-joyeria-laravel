@@ -17,6 +17,7 @@ use App\Http\Controllers\DepartureController;
 use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\CashCutController;
 use App\Http\Controllers\ReporteVentasController;
+use App\Http\Controllers\TransferController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -140,6 +141,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reports/sales-range', [ReporteVentasController::class, 'ventasPorRango']);
 
 
+    Route::post('/transfer', [TransferController::class, 'store']);
+    Route::post('/transfers/respond', [TransferController::class, 'respond']);
+
+    // Listados por sucursal (admin ya selecciona la sucursal antes)
+    Route::get('/transfer/{branch_id}/history',   [TransferController::class, 'history']);
+    Route::get('/transfer/{branch_id}/outgoing',  [TransferController::class, 'outgoing']);
+    Route::get('/transfer/{branch_id}/incoming',  [TransferController::class, 'incoming']);
 
 });
 Route::get('/states', [StateController::class, 'index']);
