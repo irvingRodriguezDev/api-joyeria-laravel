@@ -18,7 +18,7 @@ class BranchController extends Controller
                 'branch_name' => 'required|string|max:255',
                 'legal_representative' => 'required|string|max:255',
                 'email' => 'required|string|email|unique:branches,email|max:255',
-                'rfc' => 'required|string|unique:branches,rfc|max:255',
+                'rfc' => 'required|string|max:255',
                 'phone' => 'required|string|max:20',
                 'address' => 'required|string',
                 'state_id' => 'required|exists:states,id',

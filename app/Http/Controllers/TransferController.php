@@ -80,11 +80,17 @@ class TransferController extends Controller
         DB::beginTransaction();
     
         try {
-            $updatedTransfers = []; // <--- guardar los traspasos actualizados
+            $updatedTransfers = [];
+        
+            $messages = [
+                'accept' => 'Traspaso aceptado correctamente.',
+                'reject' => 'Traspaso rechazado correctamente.',
+                'cancel' => 'Traspaso cancelado correctamente.',
+            ];
         
             foreach ($data['transfer_ids'] as $id) {
-                $tr = Transfer::lockForUpdate()->find($id);
-                $product = Product::lockForUpdate()->find($tr->product_id);
+                $tr = Transfer::lockForUpdate()->findOrFail($id);
+                $product = Product::lockForUpdate()->findOrFail($tr->product_id);
             
                 if ($data['action'] === "accept") {
                     $tr->update([
@@ -111,8 +117,9 @@ class TransferController extends Controller
                 }
             
                 if ($data['action'] === "cancel") {
-                    if ($tr->status != 1)
+                    if ($tr->status != 1) {
                         throw new \Exception("El traspaso ya no puede cancelarse.");
+                    }
                 
                     $tr->update(['status' => 4]);
                 
@@ -122,12 +129,11 @@ class TransferController extends Controller
                     ]);
                 }
             
-                // 🔥 recargamos el traspaso ya actualizado y con relaciones
                 $updatedTransfers[] = Transfer::with([
-                    'origin_branch',
-                    'destination_branch',
-                    'origin_user',
-                    'destination_user',
+                    'originBranch',
+                    'destinationBranch',
+                    'originUser',
+                    'destinationUser',
                     'product'
                 ])->find($tr->id);
             }
@@ -136,14 +142,19 @@ class TransferController extends Controller
         
             return response()->json([
                 'success' => true,
+                'message' => $messages[$data['action']] ?? 'Acción realizada correctamente.',
                 'updated_transfers' => $updatedTransfers,
             ]);
         
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => $th->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ], 500);
         }
     }
+
 
 
     // ========================================================

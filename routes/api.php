@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
     Route::get('/productsByStatus/{id}', [ProductController::class, 'productsByStatus']);
-    Route::get('/productsSelect', [ProductController::class, 'productsForSelect']);
+    Route::middleware('auth:sanctum')->get('/productsSelect', [ProductController::class, 'productsForSelect']);
     Route::get('/productsAvailablePerBranch/{id}', [ProductController::class, 'ProductsAvailablePerBranch']);
 
     //clients

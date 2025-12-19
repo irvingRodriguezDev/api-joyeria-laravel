@@ -15,6 +15,10 @@ trait BranchScopeTrait
     protected function applyBranchScope(Builder $query, string $column = 'branch_id', ?string $relation = null): Builder
     {
         $user = Auth::user();
+        if (!$user) {
+            abort(401);
+        }
+
 
         if ($user && $user->type_user_id !== 1) {
             if ($relation) {
