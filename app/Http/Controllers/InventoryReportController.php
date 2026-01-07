@@ -13,11 +13,11 @@ use App\Models\Status;
 class InventoryReportController extends Controller
 {
     public function generatePdf(Request $request)
-    {
+    {   
         $request->validate([
             'branch_id' => 'required|integer|exists:branches,id',
             'status_id' => 'required|integer|exists:statuses,id',
-            'tipo' => 'required|string|in:gramos,piezas',
+            'tipo' => 'required|string|in:gramos,pieza',
         ]);
 
         $branchId = $request->branch_id;
@@ -96,7 +96,7 @@ class InventoryReportController extends Controller
         // Render vista PDF
         $reportData['date_now'] = Carbon::now()->setTimezone('America/Mexico_City');
 
-        $pdf = PDF::loadView('reports.inventory', $reportData)
+        $pdf = PDF::loadView('Reports.inventory', $reportData)
             ->setPaper('letter', 'portrait');
 
         return $pdf->download($filename);

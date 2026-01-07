@@ -266,103 +266,77 @@ class ProductController extends Controller
     }
 
     // ======= 💍 PIEZAS =======
+
+    private function piezasQuery(?int $statusId = null)
+    {
+        $query = Product::query()
+            ->whereNull('weight');
+    
+        if (!is_null($statusId)) {
+            $query->where('status_id', $statusId);
+        }
+    
+        $this->applyBranchScope($query);
+    
+        return $query;
+    }
+        public function totalPiezas()
+    {
+        return $this->respondWithScope([
+            'total_piezas' => $this->piezasQuery()->count(),
+        ]);
+    }
     public function totalDineroPiezas()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_dinero_piezas' => $query->sum('price'),
+            'total_dinero_piezas' => $this->piezasQuery()->sum('price'),
         ]);
     }
-
-    // ======= 🧮 PIEZAS EXISTENTES =======
+    
+        // ======= 🧮 PIEZAS EXISTENTES =======
     public function totalPiezasExistentes()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->where('status_id', 2)
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_piezas_existentes' => $query->count(), // No tiene sentido sumar weight aquí
+            'total_piezas_existentes' => $this->piezasQuery(2)->count(),
         ]);
     }
-
+    
     public function totalDineroPiezasExistentes()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->where('status_id', 2)
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_dinero_piezas_existentes' => $query->sum('price'),
+            'total_dinero_piezas_existentes' => $this->piezasQuery(2)->sum('price'),
         ]);
     }
-
-    // ======= ⚠️ PIEZAS DAÑADAS =======
+    
+        // ======= ⚠️ PIEZAS DAÑADAS =======
     public function totalPiezasDanados()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->where('status_id', 4)
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_piezas_danados' => $query->count(),
+            'total_piezas_danados' => $this->piezasQuery(4)->count(),
         ]);
     }
-
+    
     public function totalDineroPiezasDanados()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->where('status_id', 4)
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_dinero_piezas_danados' => $query->sum('price'),
+            'total_dinero_piezas_danados' => $this->piezasQuery(4)->sum('price'),
         ]);
     }
-
-    // ======= 🔁 PIEZAS TRASPASADAS =======
+    
+        // ======= 🔁 PIEZAS TRASPASADAS =======
     public function totalPiezasTraspasados()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->where('status_id', 3)
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_piezas_traspasados' => $query->count(),
+            'total_piezas_traspasados' => $this->piezasQuery(3)->count(),
         ]);
     }
-
+    
+    
+    
     public function totalDineroPiezasTraspasados()
     {
-        $query = Product::query()
-            ->whereNull('weight')
-            ->where('status_id', 3)
-            ->whereNull('deleted_at');
-
-        $this->applyBranchScope($query);
-
         return $this->respondWithScope([
-            'total_dinero_piezas_traspasados' => $query->sum('price'),
+            'total_dinero_piezas_traspasados' => $this->piezasQuery(3)->sum('price'),
         ]);
     }
 
