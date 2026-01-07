@@ -96,7 +96,7 @@ class InventoryReportController extends Controller
         // Render vista PDF
         $reportData['date_now'] = Carbon::now()->setTimezone('America/Mexico_City');
 
-        $pdf = PDF::loadView('Reports.inventory', $reportData)
+        $pdf = PDF::loadView('Reports.Inventory', $reportData)
             ->setPaper('letter', 'portrait');
 
         return $pdf->download($filename);
